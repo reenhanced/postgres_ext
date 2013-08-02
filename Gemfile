@@ -10,3 +10,4 @@ unless ENV['CI']
   end
 end
 gem 'fivemat'
+gem 'debugger'
