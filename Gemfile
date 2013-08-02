@@ -10,4 +10,7 @@ unless ENV['CI']
   end
 end
 gem 'fivemat'
-gem 'debugger'
+
+group :test, :development do
+  gem 'debugger'
+end
