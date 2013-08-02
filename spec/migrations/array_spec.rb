@@ -83,22 +83,44 @@ describe 'Array migrations' do
   end
 
   context 'Change Column' do
-    after { connection.drop_table :data_types }
-    it 'updates the column definitions' do
-      lambda do
-        connection.create_table :data_types do |t|
-          t.integer :array_1, :array => true, :default => []
-        end
+    describe 'Change with column existing as array' do
+      after { connection.drop_table :data_types }
+      it 'updates the column definitions' do
+        lambda do
+          connection.create_table :data_types do |t|
+            t.integer :array_1, :array => true, :default => []
+          end
 
-        connection.change_column :data_types, :array_1, :integer, :array => true, :default => [], :null => false
-      end.should_not raise_exception
+          connection.change_column :data_types, :array_1, :integer, :array => true, :default => [], :null => false
+        end.should_not raise_exception
 
-      columns = connection.columns(:data_types)
+        columns = connection.columns(:data_types)
 
-      array_1 = columns.detect { |c| c.name == 'array_1'}
-      array_1.sql_type.should eq 'integer[]'
-      array_1.default.should  eq []
-      array_1.null.should     be_false
+        array_1 = columns.detect { |c| c.name == 'array_1'}
+        array_1.sql_type.should eq 'integer[]'
+        array_1.default.should  eq []
+        array_1.null.should     be_false
+      end
+    end
+
+    describe 'Change string column to array' do
+      after { connection.drop_table :data_types }
+      it 'updates the column definitions' do
+        lambda do
+          connection.create_table :data_types do |t|
+            t.string :string_1
+          end
+
+          connection.change_column :data_types, :string_1, :string, :array => true, :default => [], :null => false
+        end.should_not raise_exception
+
+        columns = connection.columns(:data_types)
+
+        string_1 = columns.detect { |c| c.name == 'string_1'}
+        string_1.sql_type.should eq 'character varying(255)[]'
+        string_1.default.should  eq []
+        string_1.null.should     be_false
+      end
     end
   end
 
